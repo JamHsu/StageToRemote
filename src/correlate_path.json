@@ -1,0 +1,7 @@
+[
+  {
+    "name" : "{name}",
+    "src" : "{partial src file path}",
+    "target" : "{replace src string to this}"
+  }
+]
