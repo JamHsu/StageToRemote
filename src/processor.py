@@ -15,12 +15,13 @@ from git import Repo
 class BaseProcessor(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, start_code, end_code):
         self.__logger = logger.createLogger(self.__class__.__name__)
         self.__configInfo = config.ConfigInfo('config.ini')
         repoPath = self.__configInfo.repo_path
-        diffFilesPath = findDiffStagedFile(repoPath)
         self.__rootPath = utils.appendEndSlash(repoPath)
+        self.__start_commit_code = start_code
+        self.__end_commit_code = end_code
 
     @property
     def logger(self):
@@ -38,7 +39,9 @@ class BaseProcessor(object):
         self.logger.debug('---- Start Process ----')
 
         repoPath = self.configInfo.repo_path
-        diffFilesPath = findDiffStagedFile(repoPath)
+        diffFilesPath = findDiffStagedFile(repoPath,
+                                           self.__start_commit_code,
+                                           self.__end_commit_code)
         mappingPathList = parser.DataParser().parse('correlate_path.json', model.CorrelatePath.hook)
         self.do_process(mappingPathList, diffFilesPath)
 
@@ -64,7 +67,7 @@ class AutoProcessor(BaseProcessor):
                 success += 1
             except Exception as e:
                 fails += 1
-                self.logger.warn(e.message)
+                self.logger.exception(e.message)
 
         self.logger.debug('Total copy %d files to %s.' % (success, self.configInfo.ssh_ip))
         self.logger.debug('Total %d files copy failed.' % fails)
@@ -91,71 +94,13 @@ class SimpleScpCmd(object):
         target = self.__defaultRemotePrefix + target
         return "scp %s %s" % (source, target)
 
-def findDiffStagedFile(repoPath):
+def findDiffStagedFile(repoPath, start, end):
     repo = Repo(repoPath)
-    diffFiles = repo.git.diff('--staged', '--name-only')
-    # diffFiles = repo.git.diff('6a4f56f', '3982f81', '--name-only')
+    if start and end:
+        diffFiles = repo.git.diff(start, end, '--name-only')
+    else:
+        diffFiles = repo.git.diff('--staged', '--name-only')
     return diffFiles
-# class AutoDeployProcessor(object):
-
-#     def __init__(self, *args, **kwargs):
-#         self._logger = logger.createLogger(__name__)
-
-#     def process(self):
-        
-#         self._logger.debug('---- Start Process ----')
-
-#         configInfo = config.ConfigInfo('config.ini')
-#         repoPath = configInfo.repo_path
-#         diffFiles = findDiffStagedFile(repoPath)
-#         rootPath = appendSlash(repoPath)
-#         mappingPathList = parser.DataParser().parse('mapping_path.json')
-#         simpleCmdGenerate = SimpleScpCmd(configInfo.ssh_ip, configInfo.ssh_acount)
-#         # sshConnection = SSHConnection(configInfo.ssh_ip, configInfo.ssh_acount, configInfo.ssh_password)
-
-#         success = 0
-#         fails = 0
-#         pathConverter = converter.PathConverter(mappingPathList)
-#         for file_path in diffFiles.split('\n'):
-#             try:
-#                 source = rootPath + file_path
-#                 remote = pathConverter.convert(file_path)
-#                 self._logger.debug(simpleCmdGenerate.toCmd(source, remote))
-#                 # sshConnection.copyFile(source, pathConverter.convert(file_path))
-#                 # self._logger.debug("copy file from %s to %s" % (local, remote))
-#                 success += 1
-#             except Exception as e:
-#                 fails += 1
-#                 self._logger.warn(e.message)
-
-#         self._logger.debug('Total copy %d files to %s.' % (success, configInfo.ssh_ip))
-#         self._logger.debug('Total %d files copy failed.' % fails)
-
-#         self._logger.debug('---- End Process ----')
-
-
-
-
-# class SSHConnection(object):
-
-#     def __init__(self, host, user, password):
-#         self.__logger = logger.createLogger(__name__)
-#         self.__ssh = paramiko.SSHClient()
-#         self.__ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-#         self.__ssh.connect(hostname=host, username=user, password=password)
-
-#     def __del__(self):
-#         self.__ssh.close()
-
-#     def copyFile(self, local, remote):
-#         try:
-#             with SCPClient(self.__ssh.get_transport()) as scp:
-#                 scp.put(local, remote)
-#         except Exception as e:
-#             self.logger.exception('Copy file occur exception.')
-
-#     def execCommand(self, cmd):
-#         return self.__ssh.exec_command(cmd)
 
 
 

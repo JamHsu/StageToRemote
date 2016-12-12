@@ -1,4 +1,5 @@
 import paramiko
+from scp import SCPClient
 
 class SSHConnection(object):
 
@@ -11,7 +12,6 @@ class SSHConnection(object):
         self.ssh.close()
 
     def copyFile(self, local, remote):
-        print "copy file from %s to %s" % (local, remote)
         with SCPClient(self.ssh.get_transport()) as scp:
             scp.put(local, remote)
 
