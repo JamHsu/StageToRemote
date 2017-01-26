@@ -3,10 +3,16 @@
 If you develop on remote server with git, 
 this tool can help you copy staged file or specified commit range to remote server or print scp command
 
-#### Copy file mechanism
-At current version, support 2 mechanism
-1. copy file to remote server (or print scp command) when file status is **staged** 
-2. copy file of **specified commit range** to remote server (or print scp command)
+#### Version
+version= 1.1
+
+#### Copy file mode
+At current version, support below mode
+ 1. copy file to remote server (or print scp command) when file status
+    is **staged**
+ 2. copy file of **specified commit range** to remote
+    server (or print scp command)
+
 
 #### Getting Start
 
