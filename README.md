@@ -1,12 +1,12 @@
 # StageToRemote
-### A python module for helping copy stage file to remote server.
+## A python module for helping copy stage file to remote server.
 If you develop on remote server with git, 
 this tool can help you copy staged file or specified commit range to remote server or print scp command
 
-#### Version
+### Version
 version= 1.1
 
-#### Copy file mode
+### Copy file mode
 At current version, support below mode
  1. copy file to remote server (or print scp command) when file status
     is **staged**
@@ -14,7 +14,7 @@ At current version, support below mode
     server (or print scp command)
 
 
-#### Getting Start
+### Getting Start
 
 setup python libraries
 
@@ -36,7 +36,7 @@ you can use *--help* to get command information
 	  -e END_CODE, -end END_CODE
 				end commit hash code
 	
-#### Configuration
+### Configuration
 You need configure Repo and SSH infomation in *config.ini* first
 
     [Repo]
